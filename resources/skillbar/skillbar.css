@@ -1,0 +1,47 @@
+.skillbar-container {
+	display	: block;
+	position: relative;
+	width	: 100%;
+	height	: 30px; 
+	background: rgba(0,0,0, 0.1);
+	border-radius:5px;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;   
+}
+
+.skillbar-name {
+	position	: absolute;
+	top 		: 0px;
+	left		: 10px;
+	color		: white;
+	font-weight : bold;
+	font-size 	: 12px;
+	line-height : 30px; 
+}
+
+.skillbar-bar {
+	height 		: 30px;
+	line-height	: 30px;
+	width 		: 20%;
+	background  : orange;
+	border-radius:5px;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;   	
+}
+
+.skillbar-handle {
+	position:absolute;
+	height: 100%;
+	width: 1%;
+	cursor: e-resize;
+	z-index: 10;
+}
+
+.skillbar-percent {
+	position: absolute;
+	top: 0px;
+	right: 20px;
+	color: white;
+	color: rgba(0, 0, 0, 0.5);
+	line-height: 30px;
+}

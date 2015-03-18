@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+	<title>Skillbar Demo</title>
+
+	<!-- Styles -->
+	<link rel="stylesheet" href="bower_components/jqueryui/themes/smoothness/jquery-ui.css"/>
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" type="text/css"/>
+	<link rel="stylesheet" href="bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.css" type="text/css"/>
+	<link rel="stylesheet" href="bower_components/typeahead.js/dist/typeaheadjs.css" type="text/css" />
+	<link rel="stylesheet" href="resources/skillbar/skillbar.css"/>
+
+	<!-- Scripts-->
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<script src="bower_components/jqueryui/jquery-ui.js"></script>
+	<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+	<script src="bower_components/typeahead.js/dist/typeahead.bundle.js"></script>
+	<script src="bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.js"></script>
+</head>
+<body style="max-width: 600px;">
+	<div>
+		<label for="skills-input">Start Typing A Skill</label>
+		<input data-role="tagsinput" name="skills-input" id="skills-input" class="typeahead"></input>
+	</div>
+	<div class="skillbar-container">
+		<div class="skillbar-name">Name</div>
+		<div class="skillbar-bar">
+			<div class="skillbar-handle draggable ui-widget-content"></div>
+		</div>
+		<div class="skillbar-percent">20%</div>
+	</div>
+	<script type="text/javascript">
+
+	/* Function for typeahead suggestions */
+	var substringMatcher = function(strs) {
+		return function findMatches(q, cb) {
+			var matches, substrRegex;
+
+    		matches = [];
+    		substrRegex = new RegExp(q, 'i');
+
+    		// iterate through the pool of strings and for any string that
+    		// contains the substring `q`, add it to the `matches` array
+    		$.each(strs, function(i, str) {
+    			if (substrRegex.test(str)) {
+        			// the typeahead jQuery plugin expects suggestions to be a JavaScript object
+        			matches.push({ value: str });
+    			}
+			});
+
+    		cb(matches);
+		};
+	};
+
+	var skills = ['HTML', 'CSS3', 'JavaScript'];
+	$('.typeahead').tagsinput({
+		typeaheadjs:{
+			name		: 'skills',
+			displayKey	: 'value',
+			valueKey	: 'value',
+			source		: substringMatcher(skills),
+			freeInput	: false
+		}
+	});
+	function refreshSkillbar(){
+		console.log($(this).val());
+	};
+	$('.typeahead').on('change', refreshSkillbar);
+	$('.skillbar-handle').css('left', $('.skillbar-handle').parent().css('width'));
+	$('.skillbar-handle').draggable({
+		axis:'x',
+		containment:'.skillbar-container',
+		drag: function() {
+        	// Change the width of the bar
+        	$(this).parent().css('width', $(this).css('left'));
+
+        	// Change the percentage text
+        	var container_width = Number($(this).parent().parent().css('width').replace('px', ''));
+        	var bar_width 		= Number($(this).css('left').replace('px',''));
+        	var percent 		= (bar_width/container_width*100).toFixed(2);
+        	$(this).parent().siblings('.skillbar-percent').text( percent + '%');
+      }
+	});
+	</script>
+</body>
+</html>

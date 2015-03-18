@@ -1,0 +1,28 @@
+{
+  "name": "skillbar",
+  "version": "0.1.0",
+  "authors": [
+    "Cajetan Rodrigues <caje731@gmail.com>"
+  ],
+  "description": "A UI component that displays a person's skills with percentage bars",
+  "main": "skillbar.js",
+  "keywords": [
+    "skillbar"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.3",
+    "bootstrap": "~3.3.4",
+    "bootstrap-tagsinput": "~0.4.2",
+    "typeahead.js": "~0.10.5",
+    "jqueryui": "~1.11.4"
+  }
+}
