@@ -16,13 +16,17 @@
 	<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
 	<script src="bower_components/typeahead.js/dist/typeahead.bundle.js"></script>
 	<script src="bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.js"></script>
+	<script src="resources/skillbar/skillbar.js"></script>
+	
 </head>
 <body style="max-width: 600px;">
 	<div>
 		<label for="skills-input">Start Typing A Skill</label>
 		<input data-role="tagsinput" name="skills-input" id="skills-input" class="typeahead"></input>
 	</div>
-	<div class="skillbar-container" style="margin-left:20px;">
+
+	<div id="skillbar"></div>
+<!--	<div class="skillbar-container" style="margin-left:20px;">
 		<div class="skillbar-overlay"></div>
 		<div class="skillbar-name">Name</div>
 		<div class="skillbar-bar">
@@ -30,7 +34,7 @@
 		</div>
 		<div class="skillbar-percent">20%</div>
 	</div>
-	<script type="text/javascript">
+-->	<script type="text/javascript">
 
 	/* Function for typeahead suggestions */
 	var substringMatcher = function(strs) {
@@ -66,37 +70,11 @@
 	function refreshSkillbar(){
 		console.log($(this).val());
 	};
-	$('.typeahead').on('change', refreshSkillbar);
-	
-	$('.skillbar-overlay').click(function(event){
-		// Change the width of the bar
-		$('.skillbar-bar').css('width', event.offsetX + 'px');
-		
-		// Change the handle position to the mouse click coordinate
-		$('.skillbar-handle').css('left', event.offsetX + 'px');
-		
-		// Compute the new percentage
-		var container_width = Number($(this).parent().css('width').replace('px', ''));
-        var bar_width 		= Number($(this).siblings('.skillbar-bar').css('width').replace('px',''));
-        var percent 		= Math.round(bar_width/container_width*100);
-        $(this).siblings('.skillbar-percent').text( percent + '%');
-	});
-	
-	$('.skillbar-handle').css('left', $('.skillbar-handle').parent().css('width'));
-	$('.skillbar-handle').draggable({
-		axis:'x',
-		containment:'.skillbar-container',
-		drag: function() {
-        	// Change the width of the bar
-        	$(this).parent().css('width', $(this).css('left'));
 
-        	// Change the percentage text
-        	var container_width = Number($(this).parent().parent().css('width').replace('px', ''));
-        	var bar_width 		= Number($(this).css('left').replace('px',''));
-        	var percent 		= Math.round(bar_width/container_width *100 + 0.49);
-        	$(this).parent().siblings('.skillbar-percent').text( percent + '%');
-      }
+	$("#skillbar").skillbar({
+		skills:{'HTML': 80}
 	});
+	$('.typeahead').on('change', refreshSkillbar);
 	</script>
 </body>
 </html>
