@@ -105,7 +105,6 @@
 	function remove(skillbar_obj, skill){
 		delete skillbar_obj.settings.skills[skill];
 		skillbar_obj.find("#"+skill+"-container").remove();
-		console.log(skillbar_obj.settings.skills);
 	}
 
 	// Private function for attaching event listeners and change handlers
@@ -118,11 +117,33 @@
 		var percent = container.find(".skillbar-percent");
 		
 		overlay.click(function(event){
+			var allowed_delta = allowed_percent_delta(skillbar_obj);
+			var new_width = event.offsetX;
+			
+			// If click was meant to increase percentage
+			if(event.offsetX > Number(bar.css('width').replace('px',''))){
+				
+				// Do nothing when no delta allowed
+				if(allowed_delta<=0){
+					return false;
+				}
+				// Shave off extra width, based on allowed delta
+				else{
+					var max_width 	= Number(overlay.css('width').replace('px', ''));
+					var curr_percent= obj.settings.skills[name.text()];
+					var mult_factor = (curr_percent+allowed_delta)/100;
+					var intended_pc_increase = (event.offsetX/max_width)*100 - curr_percent;
+					if(intended_pc_increase > allowed_delta){
+						new_width = max_width*mult_factor;	
+					}
+				}
+			}
+			
 			// Change the width of the bar based on mouse click coordinate
-			bar.css('width', event.offsetX + 'px');
+			bar.css('width', new_width + 'px');
 		
 			// Change the handle position to the mouse click coordinate
-			handle.css('left', event.offsetX + 'px');
+			handle.css('left', new_width + 'px');
 		
 			// Compute the new percentage
 			var container_width = Number(container.css('width').replace('px', ''));
@@ -141,7 +162,17 @@
 		handle.draggable({
 			axis:'x',
 			containment:'.skillbar-container',
-			drag: function() {
+			start: function(event, ui) {
+        		start = ui.position.left;
+    		},
+			drag: function(event, ui) {
+				var allowed_delta = allowed_percent_delta(skillbar_obj);
+				stop = ui.position.left;
+				// Cancel the drag if dragged to right when no delta allowed
+				if(allowed_delta<=0 && start<stop){
+					return false;
+				};
+
         		// Change the width of the bar
         		$(this).parent().css('width', $(this).css('left'));
 
@@ -155,5 +186,14 @@
 				obj.settings.skills[name.text()] = percentage;
         	}
     	});
+	}
+
+	// Private function to calculate allowed percentage delta
+	function allowed_percent_delta(skillbar_obj){
+		var total = 0;
+		for(var skill in skillbar_obj.settings.skills){
+			total += skillbar_obj.settings.skills[skill];
+		}
+		return 100-total;
 	}
 })(jQuery);
