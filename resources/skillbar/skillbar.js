@@ -90,7 +90,7 @@
 			clean_percentage = Math.abs(Number(percent));
 		}
 		activate(skillbar_obj.append(
-			'<div id="'+skill+'-container" class="skillbar-container" style="margin-left:20px;">'+
+			'<div id="'+skill.replace(' ', '_')+'-container" class="skillbar-container" style="margin-left:20px;">'+
 				'<div class="skillbar-overlay"></div>'+
 				'<div class="skillbar-name">'+skill+'</div>'+
 				'<div class="skillbar-bar">'+
@@ -104,12 +104,12 @@
 	// Private function for removing skills
 	function remove(skillbar_obj, skill){
 		delete skillbar_obj.settings.skills[skill];
-		skillbar_obj.find("#"+skill+"-container").remove();
+		skillbar_obj.find("#"+skill.replace(' ', '_')+"-container").remove();
 	}
 
 	// Private function for attaching event listeners and change handlers
 	function activate(obj, skill){
-		var container= obj.find("#"+skill+"-container");
+		var container= obj.find("#"+skill.replace(' ', '_')+"-container");
 		var overlay = container.find(".skillbar-overlay");
 		var name 	= container.find(".skillbar-name");
 		var bar 	= container.find(".skillbar-bar");
@@ -184,7 +184,12 @@
 
 				// Finally, change the stored data
 				obj.settings.skills[name.text()] = percentage;
+        	},
+        	stop:function(event, ui){
+        		// In case the handle goes beyond allowed limit, bring it back
+				handle.css('left', bar.css('width'));
         	}
+
     	});
 	}
 
