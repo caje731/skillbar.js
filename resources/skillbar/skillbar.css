@@ -3,10 +3,11 @@
 	position: relative;
 	width	: 100%;
 	height	: 30px; 
+	margin  : 10px;
 	background: rgba(0,0,0, 0.1);
 	border-radius:5px;
 	-moz-border-radius:5px;
-	-webkit-border-radius:5px;   
+	-webkit-border-radius:5px;  
 }
 
 .skillbar-overlay {

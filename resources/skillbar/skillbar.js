@@ -3,31 +3,119 @@
 		
 		// Defaults for skillbar values
 		this.settings = $.extend({
-			skills: {},	// {'skill-1': 20, 'skill-2': 15, ...}
+			/* Skills and their percent-weights {'skill-1': 20, 'skill-2': 15, ...} */
+			skills: {},
+
+			/* Function for typeahead suggestions */
+			substringMatcher : function(strs) {
+				return function findMatches(q, cb) {
+					var matches, substrRegex;
+
+    				matches = [];
+    				substrRegex = new RegExp(q, 'i');
+
+    				// iterate through the pool of strings and for any string that
+    				// contains the substring `q`, add it to the `matches` array
+    				$.each(strs, function(i, str) {
+    					if (substrRegex.test(str)) {
+        					// the typeahead jQuery plugin expects suggestions to be a JavaScript object
+        					matches.push({ value: str });
+    					}
+					});
+
+    				cb(matches);
+				};
+			},
 		}, options);
+
+		// Generate the typeahead textbox
+		this.append(
+			'<div>'+
+				'<label for="skills-input">Start Typing A Skill</label>'+
+				'<input data-role="tagsinput" name="skills-input" id="skills-input" class="typeahead"></input>'+
+			'</div>');
+
+		var skillslist = ['HTML', 'CSS3', 'JavaScript'];
+
+		$('.typeahead').tagsinput({
+			typeaheadjs:{
+				name		: 'skills',
+				displayKey	: 'value',
+				valueKey	: 'value',
+				source		: this.settings.substringMatcher(skillslist),
+				freeInput	: false
+			}
+		});
+
+
+		skillbar_obj = this;
+		
+		// Add initial skills to the tagsinput
+		var initial_skills = Object.keys(skillbar_obj.settings.skills);
+		for (var i = initial_skills.length - 1; i >= 0; i--) {
+			$('.typeahead').tagsinput('add', initial_skills[i]);
+		};
 
 		// For each skill, generate a skill-bar
 		for (var skill in this.settings.skills){
-			activate(this.append(
-			'<div class="skillbar-container" style="margin-left:20px;">'+
+			add(this, skill, this.settings.skills[skill]);
+		}
+		
+		function updateSkills(){
+			typeahead = $(this);
+			currentSkills = typeahead.val().split(',');
+			
+			// Find what skills were added/removed
+			
+			// 1. Deletion
+			var deleted_skills = $(Object.keys(skillbar_obj.settings.skills)).not(currentSkills);
+ 			for(var i =0; i< deleted_skills.length && deleted_skills[i]!==''; i++){
+				remove(skillbar_obj, deleted_skills[i]);
+			}
+
+			// 2. Addition
+			var added_skills = $(currentSkills).not(Object.keys(skillbar_obj.settings.skills));
+			for(var i =0; i< added_skills.length && added_skills[i]!==''; i++){
+				add(skillbar_obj, added_skills[i]);
+			}
+		}
+
+		$('.typeahead').on('change', updateSkills);
+	};
+
+	// Private function for adding skills
+	function add(skillbar_obj, skill, percent){
+		var clean_percentage = 0;
+		if(Number(percent) > 0){
+			clean_percentage = Math.abs(Number(percent));
+		}
+		activate(skillbar_obj.append(
+			'<div id="'+skill+'-container" class="skillbar-container" style="margin-left:20px;">'+
 				'<div class="skillbar-overlay"></div>'+
 				'<div class="skillbar-name">'+skill+'</div>'+
 				'<div class="skillbar-bar">'+
 					'<div class="skillbar-handle draggable ui-widget-content"></div>'+
 				'</div>'+
-				'<div class="skillbar-percent">'+this.settings.skills[skill]+'%</div>'+
-			'</div>'));
-		}
-	};
+				'<div class="skillbar-percent">'+clean_percentage+'%</div>'+
+			'</div>'), skill);
+		skillbar_obj.settings.skills[skill] = clean_percentage;
+	}
+
+	// Private function for removing skills
+	function remove(skillbar_obj, skill){
+		delete skillbar_obj.settings.skills[skill];
+		skillbar_obj.find("#"+skill+"-container").remove();
+		console.log(skillbar_obj.settings.skills);
+	}
 
 	// Private function for attaching event listeners and change handlers
-	function activate(obj){
-		var container= obj.find(".skillbar-container");
-		var overlay = obj.find(".skillbar-overlay");
-		var name 	= obj.find(".skillbar-name");
-		var bar 	= obj.find(".skillbar-bar");
-		var handle 	= obj.find(".skillbar-handle");
-		var percent = obj.find(".skillbar-percent");
+	function activate(obj, skill){
+		var container= obj.find("#"+skill+"-container");
+		var overlay = container.find(".skillbar-overlay");
+		var name 	= container.find(".skillbar-name");
+		var bar 	= container.find(".skillbar-bar");
+		var handle 	= container.find(".skillbar-handle");
+		var percent = container.find(".skillbar-percent");
 		
 		overlay.click(function(event){
 			// Change the width of the bar based on mouse click coordinate

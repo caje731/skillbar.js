@@ -20,61 +20,13 @@
 	
 </head>
 <body style="max-width: 600px;">
-	<div>
-		<label for="skills-input">Start Typing A Skill</label>
-		<input data-role="tagsinput" name="skills-input" id="skills-input" class="typeahead"></input>
-	</div>
-
+	
 	<div id="skillbar"></div>
-<!--	<div class="skillbar-container" style="margin-left:20px;">
-		<div class="skillbar-overlay"></div>
-		<div class="skillbar-name">Name</div>
-		<div class="skillbar-bar">
-			<div class="skillbar-handle draggable ui-widget-content"></div>
-		</div>
-		<div class="skillbar-percent">20%</div>
-	</div>
--->	<script type="text/javascript">
-
-	/* Function for typeahead suggestions */
-	var substringMatcher = function(strs) {
-		return function findMatches(q, cb) {
-			var matches, substrRegex;
-
-    		matches = [];
-    		substrRegex = new RegExp(q, 'i');
-
-    		// iterate through the pool of strings and for any string that
-    		// contains the substring `q`, add it to the `matches` array
-    		$.each(strs, function(i, str) {
-    			if (substrRegex.test(str)) {
-        			// the typeahead jQuery plugin expects suggestions to be a JavaScript object
-        			matches.push({ value: str });
-    			}
-			});
-
-    		cb(matches);
-		};
-	};
-
-	var skills = ['HTML', 'CSS3', 'JavaScript'];
-	$('.typeahead').tagsinput({
-		typeaheadjs:{
-			name		: 'skills',
-			displayKey	: 'value',
-			valueKey	: 'value',
-			source		: substringMatcher(skills),
-			freeInput	: false
-		}
-	});
-	function refreshSkillbar(){
-		console.log($(this).val());
-	};
-
-	$("#skillbar").skillbar({
-		skills:{'HTML': 80}
-	});
-	$('.typeahead').on('change', refreshSkillbar);
+	
+	<script type="text/javascript">
+	
+	$("#skillbar").skillbar({skills: {'HTML':20}});
+	
 	</script>
 </body>
 </html>
