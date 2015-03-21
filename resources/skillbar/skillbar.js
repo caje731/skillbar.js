@@ -1,10 +1,16 @@
 (function( $ ){
 	$.fn.skillbar = function( options ){
-		
+
+		skillbar_obj = this;
+
 		// Defaults for skillbar values
-		this.settings = $.extend({
+		skillbar_obj.settings = $.extend({
+			
 			/* Skills and their percent-weights {'skill-1': 20, 'skill-2': 15, ...} */
 			skills: {},
+			
+			/* What should be displayed to describe the textbox*/
+			inputlabel: "Start Typing a Skill",
 
 			/* Function for typeahead suggestions */
 			substringMatcher : function(strs) {
@@ -29,10 +35,11 @@
 		}, options);
 
 		// Generate the typeahead textbox
-		this.append(
-			'<div>'+
-				'<label for="skills-input">Start Typing A Skill</label>'+
+		skillbar_obj.append(
+			'<div class="text-center">'+
+				'<label id="lbl-skills-input" for="skills-input">'+skillbar_obj.settings.inputlabel+'</label>'+
 				'<input data-role="tagsinput" name="skills-input" id="skills-input" class="typeahead"></input>'+
+				'<label id="lbl-expertise">'+updateExpertise()+'</label>'+
 			'</div>');
 
 		var skillslist = ['HTML', 'CSS3', 'JavaScript'];
@@ -42,14 +49,11 @@
 				name		: 'skills',
 				displayKey	: 'value',
 				valueKey	: 'value',
-				source		: this.settings.substringMatcher(skillslist),
+				source		: skillbar_obj.settings.substringMatcher(skillslist),
 				freeInput	: false
 			}
 		});
 
-
-		skillbar_obj = this;
-		
 		// Add initial skills to the tagsinput
 		var initial_skills = Object.keys(skillbar_obj.settings.skills);
 		for (var i = initial_skills.length - 1; i >= 0; i--) {
@@ -57,8 +61,8 @@
 		};
 
 		// For each skill, generate a skill-bar
-		for (var skill in this.settings.skills){
-			add(this, skill, this.settings.skills[skill]);
+		for (var skill in skillbar_obj.settings.skills){
+			add(skillbar_obj, skill, skillbar_obj.settings.skills[skill]);
 		}
 		
 		function updateSkills(){
@@ -90,7 +94,7 @@
 			clean_percentage = Math.abs(Number(percent));
 		}
 		activate(skillbar_obj.append(
-			'<div id="'+skill.replace(' ', '_')+'-container" class="skillbar-container" style="margin-left:20px;">'+
+			'<div id="'+skill.replace(' ', '_')+'-container" class="skillbar-container">'+
 				'<div class="skillbar-overlay"></div>'+
 				'<div class="skillbar-name">'+skill+'</div>'+
 				'<div class="skillbar-bar">'+
@@ -99,12 +103,37 @@
 				'<div class="skillbar-percent">'+clean_percentage+'%</div>'+
 			'</div>'), skill);
 		skillbar_obj.settings.skills[skill] = clean_percentage;
+		updateExpertise();
 	}
 
 	// Private function for removing skills
 	function remove(skillbar_obj, skill){
 		delete skillbar_obj.settings.skills[skill];
 		skillbar_obj.find("#"+skill.replace(' ', '_')+"-container").remove();
+		updateExpertise();
+	}
+
+	// Private function to find expertise based on skill-percentages
+	function getExpertise (){
+		var max_value=0;
+		var max_skill='';
+		for (var skill in skillbar_obj.settings.skills){
+			if (skillbar_obj.settings.skills[skill]>max_value){
+				max_value = skillbar_obj.settings.skills[skill];
+				max_skill = skill;
+			}
+		}
+		if(max_value<=0){
+			return 'You know nothing ! Go take some courses at <a href="http://www.khanacademy.org">Khan Academy</a>'
+		}
+		else{
+			return 'You are skilled in '+max_skill;
+		}
+	}
+
+	// Private function to update expertise text 
+	function updateExpertise(){
+		$("#lbl-expertise").html(getExpertise());
 	}
 
 	// Private function for attaching event listeners and change handlers
@@ -153,6 +182,7 @@
 
 			// Finally, change the stored data
 			obj.settings.skills[name.text()] = percentage;
+			updateExpertise();
 		});
 
 		// Set initial properties based on skill percentage
@@ -179,7 +209,7 @@
         		// Change the percentage text
         		var container_width = Number($(this).parent().parent().css('width').replace('px', ''));
         		var bar_width 		= Number($(this).css('left').replace('px',''));
-        		var percentage 		= Math.round(bar_width/container_width *100 + 0.49);
+        		var percentage 		= Math.round(bar_width/container_width * 100 + 0.49);
         		$(this).parent().siblings('.skillbar-percent').text( percentage + '%');
 
 				// Finally, change the stored data
@@ -187,7 +217,17 @@
         	},
         	stop:function(event, ui){
         		// In case the handle goes beyond allowed limit, bring it back
-				handle.css('left', bar.css('width'));
+        		// This happens when the user drags the handle very fast
+				var delta =  allowed_percent_delta(skillbar_obj);
+				if(delta<0){
+					var curr_percent = skillbar_obj.settings.skills[name.text()];
+					skillbar_obj.settings.skills[name.text()] = curr_percent + delta;
+					
+					percent.text(skillbar_obj.settings.skills[name.text()] + '%');
+					bar.css('width', percent.text());
+					handle.css('left', bar.css('width'));
+				}
+				updateExpertise();
         	}
 
     	});
