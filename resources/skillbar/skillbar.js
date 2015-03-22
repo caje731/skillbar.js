@@ -9,6 +9,28 @@
 			/* Skills and their percent-weights {'skill-1': 20, 'skill-2': 15, ...} */
 			skills: {},
 			
+			/* The list of selectable skills */
+			skillslist : ['HTML',
+						'CSS3',
+						'JavaScript',
+						'Java',
+						'Python',
+						'MySQL',
+						'C/C++',
+						'MongoDB',
+						'Scala',
+						'Ruby',
+						'Git',
+						'AngularJS',
+						'PHP',
+						'Laravel',
+						'CodeIgnitor',
+						'SVN',
+						'J2EE',
+						'Cassandra',
+						'Sass/Less',
+						],
+
 			/* What should be displayed to describe the textbox*/
 			inputlabel: "Start Typing a Skill",
 
@@ -42,14 +64,12 @@
 				'<label id="lbl-expertise">'+updateExpertise()+'</label>'+
 			'</div>');
 
-		var skillslist = ['HTML', 'CSS3', 'JavaScript'];
-
 		$('.typeahead').tagsinput({
 			typeaheadjs:{
 				name		: 'skills',
 				displayKey	: 'value',
 				valueKey	: 'value',
-				source		: skillbar_obj.settings.substringMatcher(skillslist),
+				source		: skillbar_obj.settings.substringMatcher(skillbar_obj.settings.skillslist),
 				freeInput	: false
 			}
 		});
@@ -85,6 +105,8 @@
 		}
 
 		$('.typeahead').on('change', updateSkills);
+	
+		return skillbar_obj;
 	};
 
 	// Private function for adding skills
@@ -225,8 +247,8 @@
 					
 					percent.text(skillbar_obj.settings.skills[name.text()] + '%');
 					bar.css('width', percent.text());
-					handle.css('left', bar.css('width'));
 				}
+				handle.css('left', bar.css('width'));
 				updateExpertise();
         	}
 
